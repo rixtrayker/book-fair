@@ -1,7 +1,8 @@
 import * as sqlite3 from 'sqlite3';
 import { promisify } from 'util';
 
-const db = new sqlite3.Database('./bookfair.db');
+const dbPath = process.env.NODE_ENV === 'production' ? '/data/bookfair.db' : './bookfair.db';
+const db = new sqlite3.Database(dbPath);
 
 const run = (sql: string, params: any[] = []): Promise<any> => {
   return new Promise((resolve, reject) => {

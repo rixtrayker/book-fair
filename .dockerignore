@@ -1,0 +1,13 @@
+.git/
+node_modules/
+*.db
+*.db-journal
+dist/
+build/
+.env
+.DS_Store
+excel-reader/
+public/
+server.js
+database.js
+plan.md
