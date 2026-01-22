@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Fair Visitor Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Book Fair Visitor Guide</h1>
+            <nav>
+                <button class="nav-btn active" data-view="publishers">Publishers</button>
+                <button class="nav-btn" data-view="books">My Books</button>
+                <button class="nav-btn" data-view="visits">My Visits</button>
+            </nav>
+        </header>
+
+        <!-- Publishers View -->
+        <div id="publishers-view" class="view active">
+            <div class="view-header">
+                <h2>Publishers & Booths</h2>
+                <button class="btn btn-primary" id="add-publisher-btn">Add Publisher</button>
+            </div>
+
+            <div class="filters-bar">
+                <input type="text" id="publisher-search" placeholder="Search publishers..." class="search-input">
+                <select id="hall-filter" class="filter-select">
+                    <option value="">All Halls</option>
+                </select>
+                <select id="column-filter" class="filter-select">
+                    <option value="">All Columns</option>
+                </select>
+                <button class="btn btn-secondary" id="clear-filters-btn">Clear Filters</button>
+            </div>
+
+            <div class="table-container">
+                <table id="publishers-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Hall</th>
+                            <th>Column</th>
+                            <th>Contact</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Publishers will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Books View -->
+        <div id="books-view" class="view">
+            <div class="view-header">
+                <h2>My Book List</h2>
+                <button class="btn btn-primary" id="add-book-btn">Add Book</button>
+            </div>
+
+            <div class="filters-bar">
+                <input type="text" id="book-search" placeholder="Search books..." class="search-input">
+                <select id="purchased-filter" class="filter-select">
+                    <option value="">All Books</option>
+                    <option value="true">Purchased</option>
+                    <option value="false">Wishlist</option>
+                </select>
+                <button class="btn btn-secondary" id="clear-book-filters-btn">Clear Filters</button>
+            </div>
+
+            <div class="table-container">
+                <table id="books-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Publisher</th>
+                            <th>Price</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Books will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- My Visits View -->
+        <div id="visits-view" class="view">
+            <div class="view-header">
+                <h2>My Visits</h2>
+            </div>
+
+            <div class="table-container">
+                <table id="visits-table">
+                    <thead>
+                        <tr>
+                            <th>Publisher</th>
+                            <th>Hall</th>
+                            <th>Column</th>
+                            <th>Visit Date</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Visited publishers will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Publisher Modal -->
+    <div id="publisher-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="publisher-modal-title">Add Publisher</h3>
+                <span class="close" data-modal="publisher">&times;</span>
+            </div>
+            <form id="publisher-form">
+                <input type="hidden" id="publisher-id">
+                <div class="form-group">
+                    <label for="publisher-name">Publisher Name:</label>
+                    <input type="text" id="publisher-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="publisher-hall">Hall Number:</label>
+                    <input type="text" id="publisher-hall" required>
+                </div>
+                <div class="form-group">
+                    <label for="publisher-column">Column Number:</label>
+                    <input type="text" id="publisher-column" required>
+                </div>
+                <div class="form-group">
+                    <label for="publisher-contact">Contact Info:</label>
+                    <input type="text" id="publisher-contact">
+                </div>
+                <div class="form-group">
+                    <label for="publisher-notes">Notes:</label>
+                    <textarea id="publisher-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-publisher-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Book Modal -->
+    <div id="book-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="book-modal-title">Add Book</h3>
+                <span class="close" data-modal="book">&times;</span>
+            </div>
+            <form id="book-form">
+                <input type="hidden" id="book-id">
+                <div class="form-group">
+                    <label for="book-title">Title:</label>
+                    <input type="text" id="book-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="book-author">Author:</label>
+                    <input type="text" id="book-author" required>
+                </div>
+                <div class="form-group">
+                    <label for="book-isbn">ISBN:</label>
+                    <input type="text" id="book-isbn">
+                </div>
+                <div class="form-group">
+                    <label for="book-publisher">Publisher:</label>
+                    <select id="book-publisher">
+                        <option value="">None</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="book-price">Price:</label>
+                    <input type="number" id="book-price" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="book-notes">Notes:</label>
+                    <textarea id="book-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-book-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
