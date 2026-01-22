@@ -1,18 +1,26 @@
 {
-  "name": "book-fair-testing",
+  "name": "book-fair-monorepo",
   "version": "1.0.0",
-  "description": "API testing for Book Fair Management System",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
-    "test:api": "newman run postman_collection.json --env-var baseUrl=http://localhost:3001/api --reporters cli,json --reporter-json-export newman-results.json",
-    "test:api:verbose": "newman run postman_collection.json --env-var baseUrl=http://localhost:3001/api --verbose",
-    "test:auth": "newman run postman_collection.json --folder Auth",
-    "test:users": "newman run postman_collection.json --folder Users",
-    "test:publishers": "newman run postman_collection.json --folder Publishers",
-    "test:books": "newman run postman_collection.json --folder Books",
-    "test:lists": "newman run postman_collection.json --folder Lists",
-    "test:orders": "newman run postman_collection.json --folder Orders"
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "start": "cd backend && npm start",
+    "test:api": "newman run postman_collection.json --env-var baseUrl=http://localhost:3001/api",
+    "seed": "cd backend && npm run seed",
+    "seed:excel": "cd backend && npm run seed:excel"
   },
   "devDependencies": {
+    "concurrently": "^8.2.0",
     "newman": "^6.0.0"
   }
 }

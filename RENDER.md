@@ -29,7 +29,7 @@
      - **Branch**: main
      - **Build Command**: 
        ```bash
-       cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build
+       npm install && npm run build
        ```
      - **Start Command**: 
        ```bash
