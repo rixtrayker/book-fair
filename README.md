@@ -50,7 +50,6 @@ npm run seed:excel
 - [API Testing](./API-TESTING.md)
 - [Architecture](./ARCHITECTURE.md)
 - [Deployment - Render.com (FREE)](./RENDER.md)
-- [Deployment - Fly.io](./DEPLOY.md)
 - [Excel Import](./EXCEL-IMPORT.md)
 
 ## 🎯 Features
@@ -63,18 +62,12 @@ npm run seed:excel
 
 ## 🌍 Deployment
 
-### Render.com (FREE - Recommended)
+### Render.com (FREE)
 ```bash
 # Push to GitHub, then deploy via Render dashboard
 git push origin main
 ```
 See [RENDER.md](./RENDER.md) for details.
-
-### Fly.io
-```bash
-flyctl deploy
-```
-See [DEPLOY.md](./DEPLOY.md) for details.
 
 ## 📝 Login Credentials
 
