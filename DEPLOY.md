@@ -11,37 +11,37 @@ curl -L https://fly.io/install.sh | sh
 
 2. Login to Fly:
 ```bash
-fly auth login
+flyctl auth login
 ```
 
 ### Deploy Steps
 
 1. **Create Fly app** (first time only):
 ```bash
-fly apps create book-fair
+flyctl apps create book-fair
 ```
 
 2. **Create volume for database**:
 ```bash
-fly volumes create book_fair_data --region ams --size 1
+flyctl volumes create book_fair_data --region ams --size 1
 ```
 
 3. **Deploy**:
 ```bash
-fly deploy
+flyctl deploy
 ```
 
 4. **Seed database** (first time):
 ```bash
-fly ssh console
+flyctl ssh console
 cd /app
-node dist/seed-excel.js
+node seed-production.js
 exit
 ```
 
 5. **Open app**:
 ```bash
-fly open
+flyctl open
 ```
 
 ## 🔧 Configuration
@@ -50,29 +50,29 @@ fly open
 
 Set secrets:
 ```bash
-fly secrets set JWT_SECRET=your-secret-key-here
+flyctl secrets set JWT_SECRET=your-secret-key-here
 ```
 
 ### Scale
 
 ```bash
 # Scale up
-fly scale vm shared-cpu-1x --memory 512
+flyctl scale vm shared-cpu-1x --memory 512
 
 # Scale down (auto-sleep)
-fly scale count 1
+flyctl scale count 1
 ```
 
 ### Logs
 
 ```bash
-fly logs
+flyctl logs
 ```
 
 ### SSH Access
 
 ```bash
-fly ssh console
+flyctl ssh console
 ```
 
 ## 📊 Database
@@ -82,20 +82,20 @@ Database is stored in persistent volume at `/data/bookfair.db`
 ### Backup Database
 
 ```bash
-fly ssh sftp get /data/bookfair.db ./backup.db
+flyctl ssh sftp get /data/bookfair.db ./backup.db
 ```
 
 ### Restore Database
 
 ```bash
-fly ssh sftp shell
+flyctl ssh sftp shell
 put ./backup.db /data/bookfair.db
 ```
 
 ## 🌍 Custom Domain
 
 ```bash
-fly certs add yourdomain.com
+flyctl certs add yourdomain.com
 ```
 
 ## 💰 Pricing
@@ -109,11 +109,11 @@ fly certs add yourdomain.com
 ```bash
 # Deploy new version
 git push origin main
-fly deploy
+flyctl deploy
 
 # Rollback
-fly releases
-fly releases rollback <version>
+flyctl releases
+flyctl releases rollback <version>
 ```
 
 ## 📝 URLs
@@ -126,14 +126,14 @@ fly releases rollback <version>
 ### App won't start
 
 ```bash
-fly logs
-fly ssh console
+flyctl logs
+flyctl ssh console
 ```
 
 ### Database issues
 
 ```bash
-fly ssh console
+flyctl ssh console
 ls -la /data
 sqlite3 /data/bookfair.db ".tables"
 ```
@@ -141,7 +141,7 @@ sqlite3 /data/bookfair.db ".tables"
 ### Reset everything
 
 ```bash
-fly apps destroy book-fair
+flyctl apps destroy book-fair
 # Then start over
 ```
 
@@ -158,4 +158,4 @@ After deployment:
 
 **Ready to deploy!** 🚀
 
-Run: `fly deploy`
+Run: `flyctl deploy`

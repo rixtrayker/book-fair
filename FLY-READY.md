@@ -29,24 +29,24 @@
 curl -L https://fly.io/install.sh | sh
 
 # Login
-fly auth login
+flyctl auth login
 
 # Create app
-fly apps create book-fair
+flyctl apps create book-fair
 
 # Create volume for database
-fly volumes create book_fair_data --region ams --size 1
+flyctl volumes create book_fair_data --region ams --size 1
 
 # Deploy
-fly deploy
+flyctl deploy
 
 # Seed database
-fly ssh console
+flyctl ssh console
 cd /app && node seed-production.js
 exit
 
 # Open app
-fly open
+flyctl open
 ```
 
 ## 🌍 After Deployment
@@ -81,19 +81,19 @@ Your app will be available at:
 
 ```bash
 # View logs
-fly logs
+flyctl logs
 
 # SSH into container
-fly ssh console
+flyctl ssh console
 
 # Scale up
-fly scale vm shared-cpu-1x --memory 512
+flyctl scale vm shared-cpu-1x --memory 512
 
 # Restart
-fly apps restart book-fair
+flyctl apps restart book-fair
 
 # Status
-fly status
+flyctl status
 ```
 
 ## 📝 Environment
