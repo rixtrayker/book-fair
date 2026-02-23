@@ -1,0 +1,14 @@
+{
+  "BOOK_DELETED_TITLE": "Book removed from your list",
+  "BOOK_DELETED_MESSAGE": "\"{{bookTitle}}\" was removed from your list \"{{listName}}\"",
+  "BOOK_ASSIGNED_TITLE": "A book was assigned to you",
+  "BOOK_ASSIGNED_MESSAGE": "\"{{bookTitle}}\" was assigned to you",
+  "STATUS_UPDATED_TITLE": "Book status updated",
+  "STATUS_UPDATED_MESSAGE": "\"{{bookTitle}}\" status changed to {{status}}",
+  "ORDER_CREATED_TITLE": "New order created",
+  "ORDER_CREATED_MESSAGE": "A new order was created with {{count}} books",
+  "LIST_SHARED_TITLE": "A list was shared with you",
+  "LIST_SHARED_MESSAGE": "{{userName}} shared the list \"{{listName}}\" with you",
+  "INVITATION_RECEIVED_TITLE": "New invitation",
+  "INVITATION_RECEIVED_MESSAGE": "You have been invited to join the list \"{{listName}}\""
+}

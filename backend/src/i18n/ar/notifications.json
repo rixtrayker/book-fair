@@ -1,0 +1,14 @@
+{
+  "BOOK_DELETED_TITLE": "تم حذف كتاب من قائمتك",
+  "BOOK_DELETED_MESSAGE": "تم حذف \"{{bookTitle}}\" من قائمتك \"{{listName}}\"",
+  "BOOK_ASSIGNED_TITLE": "تم تعيين كتاب لك",
+  "BOOK_ASSIGNED_MESSAGE": "تم تعيين \"{{bookTitle}}\" لك",
+  "STATUS_UPDATED_TITLE": "تم تحديث حالة الكتاب",
+  "STATUS_UPDATED_MESSAGE": "تم تحديث حالة \"{{bookTitle}}\" إلى {{status}}",
+  "ORDER_CREATED_TITLE": "تم إنشاء طلب جديد",
+  "ORDER_CREATED_MESSAGE": "تم إنشاء طلب جديد يحتوي على {{count}} كتاب",
+  "LIST_SHARED_TITLE": "تم مشاركة قائمة معك",
+  "LIST_SHARED_MESSAGE": "شارك {{userName}} معك قائمة \"{{listName}}\"",
+  "INVITATION_RECEIVED_TITLE": "دعوة جديدة",
+  "INVITATION_RECEIVED_MESSAGE": "تمت دعوتك للانضمام إلى قائمة \"{{listName}}\""
+}

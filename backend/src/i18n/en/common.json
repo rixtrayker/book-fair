@@ -1,0 +1,20 @@
+{
+  "SUCCESS": "Success",
+  "CREATED": "Created successfully",
+  "UPDATED": "Updated successfully",
+  "DELETED": "Deleted successfully",
+  "RESTORED": "Restored successfully",
+  "PAGINATION": {
+    "PAGE": "Page",
+    "OF": "of",
+    "TOTAL": "Total results",
+    "NO_RESULTS": "No results"
+  },
+  "ACTIONS": {
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "DELETE": "Delete",
+    "EDIT": "Edit"
+  }
+}
