@@ -6,13 +6,16 @@ function Header({ user, onLogout, onToggleLanguage }) {
 
   return (
     <div className="header">
-      <h1>📚 Book Fair</h1>
+      <div className="brand">
+        <div className="brand-title">{t('appTitle')}</div>
+        <div className="brand-subtitle">{t('appSubtitle')}</div>
+      </div>
       <div className="header-actions">
-        <span>{user.name} ({t(user.role)})</span>
+        <span className="user-pill">{user.name} ({t(user.role)})</span>
         <button className="btn btn-secondary" onClick={onToggleLanguage}>
           {i18n.language === 'en' ? 'العربية' : 'English'}
         </button>
-        <button className="btn btn-danger" onClick={onLogout}>
+        <button className="btn btn-outline" onClick={onLogout}>
           {t('logout')}
         </button>
       </div>

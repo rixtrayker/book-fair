@@ -106,16 +106,24 @@ function AdminDashboard() {
             <div className="card">
               <div className="card-header">
                 <h2>{t('adminView')} - {t('filter')}</h2>
-                <div className="flex gap-1">
-                  <select onChange={(e) => setFilters({ ...filters, hall: e.target.value })}>
+                <div className="table-controls">
+                  <select
+                    className="select-compact"
+                    onChange={(e) => setFilters({ ...filters, hall: e.target.value })}
+                  >
                     <option value="">{t('hall')}</option>
                     {[...new Set(allPublishers.map(p => p.hall_number))].map(h => (
                       <option key={h} value={h}>{h}</option>
                     ))}
                   </select>
-                  <select onChange={(e) => setFilters({ ...filters, priority: e.target.value })}>
+                  <select
+                    className="select-compact"
+                    onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+                  >
                     <option value="">{t('priority')}</option>
-                    {[1,2,3,4,5].map(p => <option key={p} value={p}>{p}</option>)}
+                    {[1,2,3,4,5].map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
                   </select>
                   <button className="btn btn-primary" onClick={loadAdminView}>{t('filter')}</button>
                 </div>
@@ -165,7 +173,7 @@ function AdminDashboard() {
                           <td>
                             <input
                               type="number"
-                              style={{ width: '80px' }}
+                              className="input-sm"
                               defaultValue={book.actual_price}
                               onBlur={(e) => handleUpdateTracking(book.list_book_id, {
                                 actual_price: +e.target.value
@@ -175,7 +183,7 @@ function AdminDashboard() {
                           <td>
                             <input
                               type="number"
-                              style={{ width: '80px' }}
+                              className="input-sm"
                               defaultValue={book.discount_amount}
                               onBlur={(e) => handleUpdateTracking(book.list_book_id, {
                                 discount_amount: +e.target.value

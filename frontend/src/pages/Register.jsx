@@ -22,8 +22,11 @@ function Register({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>{t('register')}</h2>
-        {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+        <div className="auth-header">
+          <h2>{t('register')}</h2>
+          <p className="auth-subtitle">{t('registerSubtitle')}</p>
+        </div>
+        {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>{t('name')}</label>
@@ -53,11 +56,11 @@ function Register({ onLogin }) {
               minLength={6}
             />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary btn-block">
             {t('register')}
           </button>
         </form>
-        <p className="text-center mt-1">
+        <p className="auth-footer">
           <a href="/login">{t('login')}</a>
         </p>
       </div>

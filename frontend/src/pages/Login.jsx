@@ -21,8 +21,11 @@ function Login({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>{t('login')}</h2>
-        {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+        <div className="auth-header">
+          <h2>{t('login')}</h2>
+          <p className="auth-subtitle">{t('loginSubtitle')}</p>
+        </div>
+        {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>{t('email')}</label>
@@ -42,11 +45,11 @@ function Login({ onLogin }) {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary btn-block">
             {t('login')}
           </button>
         </form>
-        <p className="text-center mt-1">
+        <p className="auth-footer">
           <a href="/register">{t('register')}</a>
         </p>
       </div>
