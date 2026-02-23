@@ -1,75 +1,153 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ListsService } from './lists.service';
-import { CreateListDto, UpdateListDto, AddBookToListDto, UpdateListBookDto, MergeListsDto } from './lists.dto';
-import { AuthGuard, AdminGuard } from '../auth/guards';
+import { CreateListDto, UpdateListDto, AddBookToListDto, UpdateListBookDto, MergeListsDto, InviteCollectorDto, AssignCollectorDto, RespondInvitationDto } from './lists.dto';
+import { AuthGuard, CollectorGuard, RolesGuard } from '../common/guards';
+import { User, Roles, Language } from '../common/decorators';
+import { IUser } from '../common/interfaces';
+import { UserRole } from '../common/constants';
 
 @Controller('lists')
+@UseGuards(AuthGuard)
 export class ListsController {
   constructor(private listsService: ListsService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
-  create(@Request() req, @Body() dto: CreateListDto) {
-    return this.listsService.create(req.user.userId, dto);
+  create(@User('userId') userId: number, @Body() dto: CreateListDto) {
+    return this.listsService.create(userId, dto);
   }
 
   @Get()
-  @UseGuards(AuthGuard)
-  findAll(@Request() req) {
-    return this.listsService.findAll(req.user.userId);
+  findAll(@User('userId') userId: number) {
+    return this.listsService.findAll(userId);
   }
 
   @Get('public')
-  @UseGuards(AdminGuard)
-  findPublicLists() {
-    return this.listsService.findPublicLists();
+  @UseGuards(CollectorGuard)
+  findPublicLists(@User() user: IUser) {
+    return this.listsService.findPublicLists(user);
+  }
+
+  @Get('shared/:token')
+  findByShareToken(@Param('token') token: string, @User() user: IUser) {
+    return this.listsService.findByShareToken(token, user);
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
-  findOne(@Request() req, @Param('id') id: string) {
-    return this.listsService.findOne(+id, req.user.userId);
+  findOne(@Param('id', ParseIntPipe) id: number, @User() user: IUser) {
+    return this.listsService.findOneWithAccess(id, user);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
-  update(@Request() req, @Param('id') id: string, @Body() dto: UpdateListDto) {
-    return this.listsService.update(+id, req.user.userId, dto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @User('userId') userId: number,
+    @Body() dto: UpdateListDto
+  ) {
+    return this.listsService.update(id, userId, dto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
-  remove(@Request() req, @Param('id') id: string) {
-    return this.listsService.remove(+id, req.user.userId);
+  remove(@Param('id', ParseIntPipe) id: number, @User('userId') userId: number) {
+    return this.listsService.remove(id, userId);
   }
 
   @Post(':id/books')
-  @UseGuards(AuthGuard)
-  addBook(@Request() req, @Param('id') id: string, @Body() dto: AddBookToListDto) {
-    return this.listsService.addBook(+id, req.user.userId, dto);
+  addBook(
+    @Param('id', ParseIntPipe) id: number,
+    @User('userId') userId: number,
+    @Body() dto: AddBookToListDto
+  ) {
+    return this.listsService.addBook(id, userId, dto);
   }
 
   @Get(':id/books')
-  @UseGuards(AuthGuard)
-  getListBooks(@Request() req, @Param('id') id: string) {
-    return this.listsService.getListBooks(+id, req.user.userId);
+  getListBooks(@Param('id', ParseIntPipe) id: number, @User() user: IUser) {
+    return this.listsService.getListBooks(id, user);
   }
 
   @Put('books/:bookId')
-  @UseGuards(AuthGuard)
-  updateListBook(@Request() req, @Param('bookId') bookId: string, @Body() dto: UpdateListBookDto) {
-    return this.listsService.updateListBook(+bookId, req.user.userId, dto);
+  updateListBook(
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @User() user: IUser,
+    @Body() dto: UpdateListBookDto
+  ) {
+    return this.listsService.updateListBook(bookId, user, dto);
   }
 
   @Delete('books/:bookId')
-  @UseGuards(AuthGuard)
-  removeListBook(@Request() req, @Param('bookId') bookId: string) {
-    return this.listsService.removeListBook(+bookId, req.user.userId);
+  removeListBook(
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @User('userId') userId: number
+  ) {
+    return this.listsService.removeListBook(bookId, userId);
   }
 
   @Post('merge')
-  @UseGuards(AuthGuard)
-  mergeLists(@Request() req, @Body() dto: MergeListsDto) {
-    return this.listsService.mergeLists(req.user.userId, dto);
+  mergeLists(@User('userId') userId: number, @Body() dto: MergeListsDto) {
+    return this.listsService.mergeLists(userId, dto);
+  }
+
+  @Post(':id/invite')
+  inviteCollector(
+    @Param('id', ParseIntPipe) id: number,
+    @User('userId') userId: number,
+    @Body() dto: InviteCollectorDto
+  ) {
+    return this.listsService.inviteCollector(id, userId, dto);
+  }
+
+  @Post(':id/invitation/respond')
+  respondToInvitation(
+    @Param('id', ParseIntPipe) id: number,
+    @User() user: IUser,
+    @Body() dto: RespondInvitationDto
+  ) {
+    return this.listsService.respondToInvitation(id, user, dto.accept);
+  }
+
+  @Post(':id/assign')
+  assignCollectorToList(
+    @Param('id', ParseIntPipe) id: number,
+    @User('userId') userId: number,
+    @Body() dto: AssignCollectorDto
+  ) {
+    return this.listsService.assignCollectorToList(id, userId, dto);
+  }
+
+  @Delete(':id/assign')
+  unassignCollectorFromList(
+    @Param('id', ParseIntPipe) id: number,
+    @User('userId') userId: number
+  ) {
+    return this.listsService.unassignCollectorFromList(id, userId);
+  }
+
+  @Post(':id/books/:bookId/assign')
+  assignCollectorToBook(
+    @Param('id', ParseIntPipe) listId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @User('userId') userId: number,
+    @Body() dto: AssignCollectorDto
+  ) {
+    return this.listsService.assignCollectorToBook(listId, bookId, userId, dto);
+  }
+
+  @Delete(':id/books/:bookId/assign')
+  unassignCollectorFromBook(
+    @Param('id', ParseIntPipe) listId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @User('userId') userId: number
+  ) {
+    return this.listsService.unassignCollectorFromBook(listId, bookId, userId);
+  }
+
+  @Post(':id/books/:bookId/claim')
+  @UseGuards(CollectorGuard)
+  claimBook(
+    @Param('id', ParseIntPipe) listId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @User() user: IUser
+  ) {
+    return this.listsService.claimBook(listId, bookId, user);
   }
 }
