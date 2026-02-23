@@ -1,36 +1,34 @@
-# Book Fair Management System
+# Kotobgy — Book Sourcing & Fair Management Platform
 
-A monorepo containing a complete book fair management system with NestJS backend and React frontend.
+A bilingual (Arabic-first) platform connecting book enthusiasts with collectors who source and deliver books.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 book-fair/
 ├── backend/          # NestJS API
 ├── frontend/         # React SPA
-├── package.json      # Monorepo root
-└── README.md
+├── SPEC.md           # Project specification
+├── PROJECT_PROMPT.md # Backend refactoring plan
+├── ARCHITECTURE.md   # System architecture diagrams
+└── API-TESTING.md    # API testing guide
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-### Install All Dependencies
+### Install Dependencies
 ```bash
 npm run install:all
 ```
 
-### Development (Both Services)
+### Development
 ```bash
+# Both services
 npm run dev
-```
 
-Or separately:
-```bash
-# Terminal 1 - Backend
-npm run dev:backend
-
-# Terminal 2 - Frontend
-npm run dev:frontend
+# Or separately
+npm run dev:backend   # Port 3001
+npm run dev:frontend  # Port 3000
 ```
 
 ### Production Build
@@ -38,74 +36,48 @@ npm run dev:frontend
 npm run build
 ```
 
-### Seed Database
-```bash
-npm run seed:excel
-```
-
-## 📚 Documentation
-
-- [Complete Documentation](./README-v2.md)
-- [Quick Start Guide](./QUICKSTART.md)
-- [API Testing](./API-TESTING.md)
-- [Architecture](./ARCHITECTURE.md)
-- [Deployment - Render.com (FREE)](./RENDER.md)
-- [Excel Import](./EXCEL-IMPORT.md)
-
-## 🎯 Features
-
-- **Backend**: NestJS + SQLite + JWT Auth
-- **Frontend**: React + Vite + i18n (Arabic/English)
-- **Users**: Create lists, manage books, track orders
-- **Admins**: Track books, set prices, create orders
-- **Bilingual**: Full Arabic/English support
-
-## 🌍 Deployment
-
-### Render.com (FREE)
-```bash
-# Push to GitHub, then deploy via Render dashboard
-git push origin main
-```
-See [RENDER.md](./RENDER.md) for details.
-
-## 📝 Login Credentials
-
-After seeding:
-- **User**: amr@bookfair.com / amr123
-- **Admin**: mohamed@bookfair.com / mohamed123
-
-## 🛠️ Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start both backend and frontend |
-| `npm run dev:backend` | Start backend only |
-| `npm run dev:frontend` | Start frontend only |
-| `npm run build` | Build both for production |
-| `npm run seed:excel` | Seed database from Excel |
-| `npm run test:api` | Run API tests with Newman |
-
-## 📊 Tech Stack
+## Tech Stack
 
 **Backend:**
-- NestJS
-- TypeScript
-- SQLite3
-- JWT Authentication
-- Passport
+- NestJS 10.x + TypeScript
+- SQLite3 (raw SQL)
+- JWT + Passport Authentication
+- bcrypt
 
 **Frontend:**
-- React 18
-- Vite
-- i18next (i18n)
-- Axios
-- React Router
+- React 19 + Vite
+- Tailwind CSS
+- i18next (Arabic/English)
+- Axios + React Router
 
-## 📄 License
+## Roles
+
+| Role | Description |
+|------|-------------|
+| **Customer** | Browse books, create lists, track orders |
+| **Collector** | Source books, manage orders, update status |
+| **Super Admin** | Full system access, manage users, feature flags |
+
+## Features
+
+- Book pool with search and deduplication
+- Customer wish lists with priority/status
+- Collector dashboard and claiming system
+- Order tracking and shipping management
+- In-app notifications
+- Bilingual UI (Arabic primary)
+
+## Documentation
+
+- [SPEC.md](./SPEC.md) - Complete project specification
+- [PROJECT_PROMPT.md](./PROJECT_PROMPT.md) - Backend refactoring plan
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture diagrams
+- [API-TESTING.md](./API-TESTING.md) - Postman/Newman testing guide
+
+## API Prefix
+
+All routes prefixed with `/api/v1/`
+
+## License
 
 MIT
-
----
-
-**GitHub**: https://github.com/rixtrayker/book-fair

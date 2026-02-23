@@ -9,7 +9,7 @@
 │                   Port: 3000                                 │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │    Login/    │  │     User     │  │    Admin     │     │
+│  │    Login/    │  │     User     │  │  Collector   │     │
 │  │   Register   │  │  Dashboard   │  │  Dashboard   │     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
 │                                                              │
@@ -91,24 +91,26 @@
 └─────────────┘    └─────────────┘
 ```
 
-## 🔧 Admin Workflow
+## 🔧 Collector Workflow
 
 ```
 ┌─────────────┐
-│Admin Login  │
+│Collector    │
+│Login        │
 └──────┬──────┘
        │
        ▼
 ┌─────────────────────────────────────────┐
-│        Admin Dashboard                   │
+│        Collector Dashboard               │
 └─────────────────────────────────────────┘
        │
        ├──────────────┬──────────────┬──────────────┬──────────────┐
        ▼              ▼              ▼              ▼              ▼
 ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│Admin View   │ │Manage Orders│ │Manage       │ │Manage Books │ │View All     │
-│(Public Lists│ │             │ │Publishers   │ │             │ │Users        │
-└──────┬──────┘ └──────┬──────┘ └─────────────┘ └─────────────┘ └─────────────┘
+│Collector    │ │Manage Orders│ │Manage       │ │Manage Books │ │View All     │
+│View         │ │             │ │Publishers   │ │             │ │Users        │
+│(Public Lists│ └──────┬──────┘ └─────────────┘ └─────────────┘ └─────────────┘
+└──────┬──────┘        │
        │              │
        ▼              ▼
 ┌─────────────┐ ┌─────────────┐
@@ -167,11 +169,11 @@ USER SIDE                    BACKEND                    DATABASE
                     <──────────────────────────────────
                     { id: 1, ... }
 
-ADMIN SIDE
+ADMIN SIDE (Collector)
 
 3. View Public Lists
                     ──────────────────────────────────>
-                    GET /api/orders/admin-view          SELECT * FROM list_books
+                    GET /api/orders/collector-view     SELECT * FROM list_books
                     <──────────────────────────────────  JOIN lists, books, publishers
                     [{ user, books, ... }]
 
