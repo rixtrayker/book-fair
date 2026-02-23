@@ -14,18 +14,18 @@
 |---|---|
 | Frontend | React 19 + Vite, Tailwind CSS, Axios, React Router |
 | Backend | NestJS 10.x (Express), TypeScript |
-| Database | SQLite3 — **raw SQL, no ORM** |
+| Database | PostgreSQL — **raw SQL via pg driver, no ORM** |
 | Auth | JWT + Passport (passport-jwt, passport-local) |
 | Password | bcrypt |
 | Validation | class-validator, class-transformer |
 
 ### Tech Annotations & Cautions
 
-- **SQLite concurrency:** SQLite handles concurrent writes poorly. Use WAL mode (`PRAGMA journal_mode=WAL;`) and serialize write operations through a queue or mutex for any multi-collector claim scenarios. Consider `better-sqlite3` over `sqlite3` for synchronous performance if not already used.
-- **Arabic text & SQLite:** SQLite's default `LIKE` is ASCII-only. For Arabic search, use a custom collation or normalize text (strip tashkeel/diacritics) before storage and search. Store a `normalized_title` / `normalized_author` column alongside the original. Package suggestion: a small utility using `String.normalize('NFD').replace(...)` to strip Arabic diacritics (ـَـُـِـّـْ).
+- **PostgreSQL:** Production-grade database with excellent concurrency, full-text search, and JSON support. Use connection pooling for optimal performance.
+- **Arabic text & Search:** PostgreSQL supports UTF-8 natively. For Arabic search, use `ILIKE` for case-insensitive matching or implement full-text search with `pg_trgm` extension for better results. Consider storing a `normalized_title` / `normalized_author` column with diacritics stripped for better matching.
 - **RTL support:** Tailwind CSS supports RTL via `dir="rtl"` on the root element + `rtl:` variant prefix. Use logical properties (`ps-4` instead of `pl-4`, `ms-2` instead of `ml-2`) throughout. Set up an i18n solution — recommend `react-i18next` with namespace separation per path.
 - **File uploads (book covers, shipping stickers):** Use `@nestjs/platform-express` with `multer`. Store files on disk (e.g., `/uploads/{type}/{id}/`) since there's no cloud infra mentioned. Serve via a static route or a dedicated controller. Validate MIME types server-side (images only for covers, images+PDF for stickers). Max file size suggestion: 5MB per file.
-- **Search:** For the book pool, implement server-side search with `LIKE '%term%'` on normalized columns. If the pool grows large (>10k books), consider adding FTS5 (`CREATE VIRTUAL TABLE books_fts USING fts5(...)`) for full-text Arabic search — SQLite FTS5 handles tokenization well with the `unicode61` tokenizer.
+- **Search:** For the book pool, implement server-side search with `ILIKE '%term%'` on normalized columns. PostgreSQL's `pg_trgm` extension enables efficient trigram-based search for Arabic text. Consider `CREATE INDEX ON books USING gin (title gin_trgm_ops)` for fast fuzzy matching.
 - **LLM book list import (Path 2 — Collector feature):** The collector may paste unstructured text or upload a file, then an LLM formats it into the system's template. Implement this as a backend endpoint that calls an external LLM API (e.g., Anthropic Claude API). Define a strict JSON schema for the output. Validate every row before import. Do NOT auto-commit — show a preview to the collector first.
 
 ---
@@ -258,7 +258,7 @@ Once a collector sets status to `shipped`:
 #### D2. Implementation Notes
 
 - Start with **in-app notifications** (a `notifications` table: `id`, `user_id`, `type`, `payload` JSON, `read`, `created_at`).
-- Frontend: poll or use SSE (Server-Sent Events) for real-time — avoid WebSockets complexity with SQLite.
+- Frontend: poll or use SSE (Server-Sent Events) for real-time updates.
   - **NestJS SSE:** Use `@Sse()` decorator with `Observable<MessageEvent>`. Lightweight and built-in.
 - Future: email or push notifications can be layered on.
 
@@ -287,16 +287,16 @@ Once a collector sets status to `shipped`:
 - Pagination: `?page=1&limit=20` with response metadata `{ total, page, limit, totalPages }`.
 - Auth: Bearer JWT on all protected routes. Use NestJS Guards (`@UseGuards(JwtAuthGuard, RolesGuard)`).
 - Validation: Use `class-validator` DTOs on all inputs. Fail fast with 400.
-- **Arabic content:** Accept and store UTF-8. Ensure `Content-Type: application/json; charset=utf-8` headers. SQLite handles UTF-8 natively.
+- **Arabic content:** Accept and store UTF-8. Ensure `Content-Type: application/json; charset=utf-8` headers. PostgreSQL handles UTF-8 natively.
 
 ---
 
 ## Database Design Notes
 
-- **No ORM.** All queries are raw SQL via `better-sqlite3` or `sqlite3` driver.
-- Use migrations: keep a `/migrations` folder with sequential `.sql` files. Write a simple runner or use `sql-migrations` npm package.
-- **Foreign keys:** Enable with `PRAGMA foreign_keys = ON;` on every connection.
-- **Timestamps:** Store as ISO 8601 strings or Unix epoch integers. Be consistent.
+- **No ORM.** All queries are raw SQL via `pg` driver.
+- Use migrations: sequential `.sql` files in `/migrations` folder with a custom runner.
+- **Foreign keys:** PostgreSQL enforces foreign keys by default.
+- **Timestamps:** Store as `TIMESTAMPTZ` for timezone-aware timestamps.
 - **Soft deletes:** Use `deleted_at` column where needed (lists, entries) rather than hard deletes.
 
 ---
