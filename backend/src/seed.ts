@@ -1,24 +1,29 @@
-import { run } from './database';
+import { run, initDatabase } from './database';
 import * as bcrypt from 'bcrypt';
 
 async function seed() {
   console.log('🌱 Seeding database...');
 
-  // Create admin user
+  await initDatabase();
+
   const adminPassword = await bcrypt.hash('admin123', 10);
-  await run(
-    'INSERT OR IGNORE INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
-    ['admin@bookfair.com', adminPassword, 'Admin User', 'admin']
+  const adminResult = await run(
+    "INSERT INTO users (email, password, name, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING RETURNING id",
+    ['admin@bookfair.com', adminPassword, 'Admin User', 'collector']
   );
 
-  // Create test user
   const userPassword = await bcrypt.hash('user123', 10);
-  await run(
-    'INSERT OR IGNORE INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
-    ['user@bookfair.com', userPassword, 'Test User', 'user']
+  const userResult = await run(
+    "INSERT INTO users (email, password, name, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING RETURNING id",
+    ['user@bookfair.com', userPassword, 'Test User', 'customer']
   );
 
-  // Create publishers
+  const superAdminPassword = await bcrypt.hash('superadmin123', 10);
+  await run(
+    "INSERT INTO users (email, password, name, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING RETURNING id",
+    ['superadmin@bookfair.com', superAdminPassword, 'Super Admin', 'super_admin']
+  );
+
   const publishers = [
     { name: 'Dar Al-Shorouk', hall: 'A', booth: '101' },
     { name: 'Nahdet Misr', hall: 'A', booth: '102' },
@@ -29,12 +34,11 @@ async function seed() {
 
   for (const pub of publishers) {
     await run(
-      'INSERT OR IGNORE INTO publishers (name, hall_number, booth_number) VALUES (?, ?, ?)',
+      'INSERT INTO publishers (name, hall_number, booth_number) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
       [pub.name, pub.hall, pub.booth]
     );
   }
 
-  // Create books
   const books = [
     { title: 'The Alchemist', author: 'Paulo Coelho', isbn: '978-0062315007', publisher_id: 1, price: 150 },
     { title: '1984', author: 'George Orwell', isbn: '978-0451524935', publisher_id: 2, price: 120 },
@@ -50,7 +54,7 @@ async function seed() {
 
   for (const book of books) {
     await run(
-      'INSERT OR IGNORE INTO books (title, author, isbn, publisher_id, original_price, category) VALUES (?, ?, ?, ?, ?, ?)',
+      'INSERT INTO books (title, author, isbn, publisher_id, original_price, category) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING',
       [book.title, book.author, book.isbn, book.publisher_id, book.price, 'Fiction']
     );
   }
@@ -58,8 +62,14 @@ async function seed() {
   console.log('✅ Database seeded successfully!');
   console.log('');
   console.log('Test accounts:');
-  console.log('Admin: admin@bookfair.com / admin123');
-  console.log('User: user@bookfair.com / user123');
+  console.log('Customer: user@bookfair.com / user123');
+  console.log('Collector: admin@bookfair.com / admin123');
+  console.log('Super Admin: superadmin@bookfair.com / superadmin123');
+  
+  process.exit(0);
 }
 
-seed().catch(console.error);
+seed().catch((err) => {
+  console.error('Seed error:', err);
+  process.exit(1);
+});
