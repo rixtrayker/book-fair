@@ -40,9 +40,9 @@ npm run build
 
 **Backend:**
 - NestJS 10.x + TypeScript
-- SQLite3 (raw SQL)
+- PostgreSQL (raw SQL via pg)
 - JWT + Passport Authentication
-- bcrypt
+- bcrypt + rate limiting
 
 **Frontend:**
 - React 19 + Vite
