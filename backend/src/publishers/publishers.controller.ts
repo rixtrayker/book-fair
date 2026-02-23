@@ -1,39 +1,41 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { PublishersService } from './publishers.service';
 import { CreatePublisherDto, UpdatePublisherDto } from './publishers.dto';
-import { AuthGuard, AdminGuard } from '../auth/guards';
+import { AuthGuard, CollectorGuard } from '../common/guards';
 
 @Controller('publishers')
+@UseGuards(AuthGuard)
 export class PublishersController {
   constructor(private publishersService: PublishersService) {}
 
   @Post()
-  @UseGuards(AdminGuard)
+  @UseGuards(CollectorGuard)
   create(@Body() dto: CreatePublisherDto) {
     return this.publishersService.create(dto);
   }
 
   @Get()
-  @UseGuards(AuthGuard)
-  findAll() {
-    return this.publishersService.findAll();
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    return this.publishersService.findAll(page ? +page : 1, limit ? +limit : 20);
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.publishersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.publishersService.findOne(id);
   }
 
   @Put(':id')
-  @UseGuards(AdminGuard)
-  update(@Param('id') id: string, @Body() dto: UpdatePublisherDto) {
-    return this.publishersService.update(+id, dto);
+  @UseGuards(CollectorGuard)
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePublisherDto) {
+    return this.publishersService.update(id, dto);
   }
 
   @Delete(':id')
-  @UseGuards(AdminGuard)
-  remove(@Param('id') id: string) {
-    return this.publishersService.remove(+id);
+  @UseGuards(CollectorGuard)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.publishersService.remove(id);
   }
 }
