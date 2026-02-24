@@ -82,7 +82,7 @@ newman run postman_collection.json
 
 The collection uses these variables (auto-populated by tests):
 
-- `baseUrl` - API base URL (default: http://localhost:3001/api)
+- `baseUrl` - API base URL (default: http://localhost:3001/api/v1)
 - `token` - JWT token (set after login)
 - `userId` - Current user ID
 - `listId` - Last created list ID
@@ -96,7 +96,7 @@ Create a Postman environment with:
 
 ```json
 {
-  "baseUrl": "http://localhost:3001/api"
+  "baseUrl": "http://localhost:3001/api/v1"
 }
 ```
 
@@ -150,7 +150,7 @@ After running `./test-api.sh`, check:
 newman run postman_collection.json --folder "Auth"
 
 # Test with custom environment
-newman run postman_collection.json --env-var "baseUrl=http://localhost:3001/api"
+newman run postman_collection.json --env-var "baseUrl=http://localhost:3001/api/v1"
 
 # Generate HTML report
 newman run postman_collection.json --reporters cli,html

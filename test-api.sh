@@ -18,7 +18,7 @@ fi
 
 # Run the collection
 newman run postman_collection.json \
-    --env-var "baseUrl=http://localhost:3001/api" \
+    --env-var "baseUrl=http://localhost:3001/api/v1" \
     --reporters cli,json \
     --reporter-json-export newman-results.json
 
