@@ -1,4 +1,16 @@
-import { IsNotEmpty, IsOptional, IsNumber, IsInt, Min, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsNumber, IsInt, Min, IsString, MaxLength, Max } from 'class-validator';
+
+export class BookSearchDto {
+  @IsString({ message: 'validation.SEARCH_MUST_BE_STRING' })
+  @IsNotEmpty({ message: 'validation.SEARCH_REQUIRED' })
+  q: string;
+
+  @IsOptional()
+  @IsInt({ message: 'validation.LIMIT_MUST_BE_INT' })
+  @Min(1, { message: 'validation.LIMIT_MIN_1' })
+  @Max(50, { message: 'validation.LIMIT_MAX_50' })
+  limit?: number = 20;
+}
 
 export class CreateBookDto {
   @IsString({ message: 'validation.TITLE_MUST_BE_STRING' })

@@ -12,6 +12,26 @@ function normalizeArabic(text: string): string {
     .toLowerCase();
 }
 
+function sanitizeSearchTerm(term: string): string {
+  if (!term || !term.trim()) return '';
+  
+  const cleaned = term.replace(/[!|&():*'\\"]/g, ' ');
+  
+  const words = cleaned.split(/\s+/).filter(w => w.trim().length > 0);
+  
+  if (words.length === 0) return '';
+  
+  const lastIdx = words.length - 1;
+  const parts = words.map((word, i) => {
+    if (i === lastIdx) {
+      return `${word}:*`;
+    }
+    return word;
+  });
+  
+  return parts.join(' & ');
+}
+
 @Injectable()
 export class BooksService {
   async create(dto: CreateBookDto) {
@@ -64,6 +84,50 @@ export class BooksService {
   }
 
   async search(query: string, limit: number = 20) {
+    if (!query || !query.trim()) {
+      return { data: [], pagination: { total: 0, page: 1, limit, totalPages: 0 } };
+    }
+
+    const sanitized = sanitizeSearchTerm(query);
+    
+    if (!sanitized) {
+      return { data: [], pagination: { total: 0, page: 1, limit, totalPages: 0 } };
+    }
+
+    const books = await all(`
+      SELECT 
+        b.id, b.title, b.author, b.isbn, b.original_price, b.category,
+        b.publisher_id, b.cover_image,
+        p.name as publisher_name, p.booth_number, p.hall_number,
+        ts_rank(b.searchable, to_tsquery('simple', $1)) as rank
+      FROM books b 
+      LEFT JOIN publishers p ON b.publisher_id = p.id
+      WHERE b.deleted_at IS NULL
+        AND b.searchable @@ to_tsquery('simple', $1)
+      ORDER BY rank DESC, b.title
+      LIMIT $2
+    `, [sanitized, limit]);
+    
+    const countResult = await get(`
+      SELECT COUNT(*) as total FROM books
+      WHERE deleted_at IS NULL
+        AND searchable @@ to_tsquery('simple', $1)
+    `, [sanitized]);
+    
+    const total = parseInt(countResult?.total || '0', 10);
+    
+    return {
+      data: books.map((b: any) => ({ ...b, rank: parseFloat(b.rank) })),
+      pagination: {
+        total,
+        page: 1,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
+  
+  async searchFallback(query: string, limit: number = 20) {
     const normalizedQuery = normalizeArabic(query);
     return await all(`
       SELECT b.*, p.name as publisher_name, p.booth_number, p.hall_number 

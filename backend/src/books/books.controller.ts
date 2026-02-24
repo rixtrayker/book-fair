@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { BooksService } from './books.service';
-import { CreateBookDto, UpdateBookDto } from './books.dto';
+import { CreateBookDto, UpdateBookDto, BookSearchDto } from './books.dto';
 import { AuthGuard, CollectorGuard, SuperAdminGuard } from '../common/guards';
 
 @ApiTags('books')
@@ -20,19 +20,26 @@ export class BooksController {
     return this.booksService.create(dto);
   }
 
+  @Get('search')
+  @ApiOperation({ summary: 'Full-text search books with relevance ranking' })
+  @ApiQuery({ name: 'q', required: true, description: 'Search query (min 1 char)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Max results (default 20, max 50)', example: 20 })
+  @ApiResponse({ status: 200, description: 'Search results with relevance scores' })
+  search(
+    @Query() query: BookSearchDto
+  ) {
+    const limit = Math.min(query.limit || 20, 50);
+    return this.booksService.search(query.q, limit);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all books with pagination' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search query' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 20 })
   findAll(
-    @Query('search') search?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string
   ) {
-    if (search) {
-      return this.booksService.search(search, limit ? +limit : 20);
-    }
     return this.booksService.findAll(page ? +page : 1, limit ? +limit : 20);
   }
 
