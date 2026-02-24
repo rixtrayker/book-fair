@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { auth } from '../api';
+import { auth, User } from '../api';
 
-function Register({ onLogin }) {
+interface RegisterProps {
+  onLogin: (user: User, token: string) => void;
+}
+
+function Register({ onLogin }: RegisterProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await auth.register({ email, password, name });
-      onLogin(data.user, data.token);
-    } catch (err) {
+      const { data: response } = await auth.register({ email, password, name });
+      onLogin(response.data.user, response.data.token);
+    } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
     }
   };

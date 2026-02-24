@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { auth } from '../api';
+import { auth, User } from '../api';
 
-function Login({ onLogin }) {
+interface LoginProps {
+  onLogin: (user: User, token: string) => void;
+}
+
+function Login({ onLogin }: LoginProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await auth.login({ email, password });
-      onLogin(data.user, data.token);
-    } catch (err) {
+      const { data: response } = await auth.login({ email, password });
+      onLogin(response.data.user, response.data.token);
+    } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     }
   };

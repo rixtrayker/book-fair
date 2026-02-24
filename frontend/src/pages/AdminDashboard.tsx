@@ -1,16 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { orders, publishers, books, lists } from '../api';
+import { orders, publishers, books, AdminViewItem, Publisher, Book, OrderWithDetails } from '../api';
+
+interface GroupedUserData {
+  user_name: string;
+  user_email: string;
+  books: AdminViewItem[];
+}
+
+interface AdminFilters {
+  hall?: string;
+  priority?: string;
+}
 
 function AdminDashboard() {
   const { t } = useTranslation();
-  const [adminView, setAdminView] = useState([]);
-  const [allOrders, setAllOrders] = useState([]);
-  const [allPublishers, setAllPublishers] = useState([]);
-  const [allBooks, setAllBooks] = useState([]);
-  const [filters, setFilters] = useState({});
-  const [selectedBooks, setSelectedBooks] = useState([]);
+  const [adminView, setAdminView] = useState<AdminViewItem[]>([]);
+  const [allOrders, setAllOrders] = useState<OrderWithDetails[]>([]);
+  const [allPublishers, setAllPublishers] = useState<Publisher[]>([]);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [filters, setFilters] = useState<AdminFilters>({});
+  const [selectedBooks, setSelectedBooks] = useState<number[]>([]);
 
   useEffect(() => {
     loadAdminView();
@@ -20,31 +31,31 @@ function AdminDashboard() {
   }, []);
 
   const loadAdminView = async () => {
-    const { data } = await orders.getAdminView(filters);
-    setAdminView(data);
+    const { data: response } = await orders.getAdminView(filters as any);
+    setAdminView(response.data);
   };
 
   const loadOrders = async () => {
-    const { data } = await orders.getAll();
-    setAllOrders(data);
+    const { data: response } = await orders.getAll();
+    setAllOrders(response.data as OrderWithDetails[]);
   };
 
   const loadPublishers = async () => {
-    const { data } = await publishers.getAll();
-    setAllPublishers(data);
+    const { data: response } = await publishers.getAll();
+    setAllPublishers(response.data);
   };
 
   const loadBooks = async () => {
-    const { data } = await books.getAll();
-    setAllBooks(data);
+    const { data: response } = await books.getAll();
+    setAllBooks(response.data);
   };
 
-  const handleUpdateTracking = async (listBookId, updates) => {
+  const handleUpdateTracking = async (listBookId: number, updates: Record<string, any>) => {
     await orders.updateTracking({ list_book_id: listBookId, ...updates });
     loadAdminView();
   };
 
-  const handleCreateOrder = async (userId) => {
+  const handleCreateOrder = async (userId: number) => {
     const userBooks = selectedBooks.filter(id => {
       const book = adminView.find(b => b.list_book_id === id);
       return book && book.user_id === userId;
@@ -61,12 +72,12 @@ function AdminDashboard() {
     loadAdminView();
   };
 
-  const handleUpdateOrderStatus = async (orderId, status) => {
-    await orders.update(orderId, { shipping_status: status });
+  const handleUpdateOrderStatus = async (orderId: number, status: string) => {
+    await orders.update(orderId, { shipping_status: status as any });
     loadOrders();
   };
 
-  const toggleBookSelection = (listBookId) => {
+  const toggleBookSelection = (listBookId: number) => {
     setSelectedBooks(prev =>
       prev.includes(listBookId)
         ? prev.filter(id => id !== listBookId)
@@ -74,8 +85,8 @@ function AdminDashboard() {
     );
   };
 
-  const groupByUser = () => {
-    const grouped = {};
+  const groupByUser = (): Record<string, GroupedUserData> => {
+    const grouped: Record<string, GroupedUserData> = {};
     adminView.forEach(book => {
       if (!grouped[book.user_id]) {
         grouped[book.user_id] = {
@@ -88,6 +99,8 @@ function AdminDashboard() {
     });
     return grouped;
   };
+
+  const uniqueHalls = [...new Set(allPublishers.map(p => p.hall_number).filter(Boolean))];
 
   return (
     <div>
@@ -112,8 +125,8 @@ function AdminDashboard() {
                     onChange={(e) => setFilters({ ...filters, hall: e.target.value })}
                   >
                     <option value="">{t('hall')}</option>
-                    {[...new Set(allPublishers.map(p => p.hall_number))].map(h => (
-                      <option key={h} value={h}>{h}</option>
+                    {uniqueHalls.map(h => (
+                      <option key={h as string} value={h as string}>{h}</option>
                     ))}
                   </select>
                   <select
@@ -174,7 +187,7 @@ function AdminDashboard() {
                             <input
                               type="number"
                               className="input-sm"
-                              defaultValue={book.actual_price}
+                              defaultValue={book.actual_price ?? undefined}
                               onBlur={(e) => handleUpdateTracking(book.list_book_id, {
                                 actual_price: +e.target.value
                               })}
@@ -184,7 +197,7 @@ function AdminDashboard() {
                             <input
                               type="number"
                               className="input-sm"
-                              defaultValue={book.discount_amount}
+                              defaultValue={book.discount_amount ?? undefined}
                               onBlur={(e) => handleUpdateTracking(book.list_book_id, {
                                 discount_amount: +e.target.value
                               })}
@@ -239,7 +252,7 @@ function AdminDashboard() {
                   {allOrders.map(order => (
                     <tr key={order.id}>
                       <td>{order.id}</td>
-                      <td>{order.user_name}</td>
+                      <td>{order.user_name || '-'}</td>
                       <td>{order.total_price}</td>
                       <td>
                         <select
@@ -252,7 +265,7 @@ function AdminDashboard() {
                           <option value="delivered">{t('delivered')}</option>
                         </select>
                       </td>
-                      <td>{order.admin_name}</td>
+                      <td>{order.collector_name || '-'}</td>
                     </tr>
                   ))}
                 </tbody>

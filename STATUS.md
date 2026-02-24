@@ -1,16 +1,24 @@
 # Kotobgy - Project Status & Next Steps
 
-> Last Updated: 2026-02-23
+> Last Updated: 2026-02-24
 
 ---
 
 ## Executive Summary
 
-**Kotobgy** is a bilingual (Arabic-first) book sourcing and fair management platform. The backend refactoring is **complete**, implementing all planned features from PROJECT_PROMPT.md Phases 1-10. The frontend requires updates to align with the new backend API structure and to implement missing features from SPEC.md.
+**Kotobgy** is a bilingual (Arabic-first) book sourcing and fair management platform. The backend refactoring is **complete**, implementing all planned features from PROJECT_PROMPT.md Phases 1-10. The frontend TypeScript migration is **complete**. Remaining work involves implementing missing UI features from SPEC.md.
 
 ---
 
 ## Backend Status: COMPLETE
+
+### Session Fixes Applied
+
+| Fix | Description |
+|-----|-------------|
+| JwtModule imports | Added to all modules using AuthGuard |
+| FTS Migration | Fixed subquery issue, now uses simple tsvector |
+| Database | Created kotobgy database, ran all migrations |
 
 ### Implemented Features
 
@@ -59,14 +67,24 @@ See [frontend/src/api/ENDPOINTS.md](./frontend/src/api/ENDPOINTS.md) for complet
 
 ---
 
-## Frontend Status: NEEDS UPDATES
+## Frontend Status: TYPESCRIPT MIGRATION COMPLETE
 
-### Current Issues (Fixed in new files)
+### Completed This Session
+
+| Task | Status |
+|------|--------|
+| Convert JSX to TSX (7 files) | DONE |
+| i18n default to Arabic | DONE |
+| index.html lang/dir RTL | DONE |
+| TypeScript strict mode | DONE |
+| Build passes | DONE |
+| Tailwind CSS installed | DONE |
+
+### Previous Fixes (Already Applied)
 
 | Issue | Status |
 |-------|--------|
-| Role check uses old 'admin' | Fixed in new api/index.ts types |
-| i18n defaults to English | Fix needed in i18n.js |
+| Role check uses old 'admin' | Fixed - now uses 'super_admin' |
 | API proxy wrong port | Fixed in vite.config.ts (3001) |
 | No pagination support | Added in api/index.ts |
 | No notifications API | Added in api/index.ts |
@@ -102,17 +120,24 @@ frontend/
 │   │   ├── index.ts          # Complete API client with types
 │   │   └── ENDPOINTS.md      # API documentation
 │   ├── components/
+│   │   └── Header.tsx        # Converted to TypeScript
 │   ├── pages/
+│   │   ├── Login.tsx         # Converted to TypeScript
+│   │   ├── Register.tsx      # Converted to TypeScript
+│   │   ├── UserDashboard.tsx # Converted to TypeScript
+│   │   └── AdminDashboard.tsx # Converted to TypeScript
 │   ├── hooks/
 │   ├── stores/               # Zustand stores
-│   ├── i18n/
-│   ├── types/
+│   ├── i18n.ts               # Defaults to Arabic (ar)
+│   ├── App.tsx               # Converted to TypeScript
+│   ├── main.tsx              # Converted to TypeScript
 │   └── utils/
 ├── tsconfig.json             # TypeScript config
 ├── tsconfig.node.json
 ├── tailwind.config.js        # Tailwind with RTL
 ├── postcss.config.js
 ├── vite.config.ts            # Fixed proxy port
+├── index.html                # lang="ar" dir="rtl"
 └── package.json              # Updated dependencies
 ```
 
@@ -174,9 +199,10 @@ const isSuperAdmin = user.role === 'super_admin';
 - [x] Update package.json with recommended packages
 - [x] Fix vite.config.ts proxy port
 - [x] Create complete API client with types
-- [ ] Update i18n.js to default to Arabic
-- [ ] Convert existing .jsx to .tsx
-- [ ] Add Tailwind directives to CSS
+- [x] Update i18n to default to Arabic
+- [x] Convert existing .jsx to .tsx
+- [x] Add Tailwind directives to CSS
+- [x] Fix backend module dependencies (JwtModule)
 
 ### Phase 2: Core UI Updates
 - [ ] Create CollectorDashboard (rename AdminDashboard)

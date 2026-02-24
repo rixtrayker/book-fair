@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, FormEvent } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { lists, books, orders } from '../api';
+import { lists, books, orders, List, Book, ListBookWithDetails, Order } from '../api';
 
 function UserDashboard() {
   const { t } = useTranslation();
-  const [myLists, setMyLists] = useState([]);
-  const [allBooks, setAllBooks] = useState([]);
-  const [selectedList, setSelectedList] = useState(null);
-  const [listBooks, setListBooks] = useState([]);
-  const [myOrders, setMyOrders] = useState([]);
+  const [myLists, setMyLists] = useState<List[]>([]);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [selectedList, setSelectedList] = useState<number | null>(null);
+  const [listBooks, setListBooks] = useState<ListBookWithDetails[]>([]);
+  const [myOrders, setMyOrders] = useState<Order[]>([]);
   const [showCreateList, setShowCreateList] = useState(false);
   const [newList, setNewList] = useState({ name: '', description: '', is_public: false });
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,7 +17,7 @@ function UserDashboard() {
   const [selectedPublisher, setSelectedPublisher] = useState('all');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [previewBook, setPreviewBook] = useState(null);
+  const [previewBook, setPreviewBook] = useState<Book | null>(null);
   const [visibleCount, setVisibleCount] = useState(12);
   const [loadingBooks, setLoadingBooks] = useState(false);
 
@@ -32,32 +32,32 @@ function UserDashboard() {
   }, [searchQuery, selectedCategory, selectedPublisher, minPrice, maxPrice]);
 
   const loadLists = async () => {
-    const { data } = await lists.getAll();
-    setMyLists(data);
+    const { data: response } = await lists.getAll();
+    setMyLists(response.data);
   };
 
   const loadBooks = async () => {
     setLoadingBooks(true);
     try {
-      const { data } = await books.getAll();
-      setAllBooks(data);
+      const { data: response } = await books.getAll();
+      setAllBooks(response.data);
     } finally {
       setLoadingBooks(false);
     }
   };
 
   const loadOrders = async () => {
-    const { data } = await orders.getMyOrders();
-    setMyOrders(data);
+    const { data: response } = await orders.getMyOrders();
+    setMyOrders(response.data);
   };
 
-  const loadListBooks = async (listId) => {
-    const { data } = await lists.getBooks(listId);
-    setListBooks(data);
+  const loadListBooks = async (listId: number) => {
+    const { data: response } = await lists.getBooks(listId);
+    setListBooks(response.data);
     setSelectedList(listId);
   };
 
-  const handleCreateList = async (e) => {
+  const handleCreateList = async (e: FormEvent) => {
     e.preventDefault();
     await lists.create(newList);
     setNewList({ name: '', description: '', is_public: false });
@@ -65,27 +65,27 @@ function UserDashboard() {
     loadLists();
   };
 
-  const handleAddBookToList = async (bookId) => {
+  const handleAddBookToList = async (bookId: number) => {
     if (!selectedList) {
       alert(t('selectListFirst'));
       return;
     }
-    await lists.addBook(selectedList, { book_id: bookId, status: 'want', priority: 3 });
+    await lists.addBook(selectedList, { book_id: bookId, status: 'pending', priority: 3 });
     loadListBooks(selectedList);
   };
 
-  const handleUpdateBookStatus = async (listBookId, status, priority) => {
-    await lists.updateBook(listBookId, { status, priority });
-    loadListBooks(selectedList);
+  const handleUpdateBookStatus = async (listBookId: number, status: string, priority: number) => {
+    await lists.updateBook(listBookId, { status: status as any, priority });
+    if (selectedList) loadListBooks(selectedList);
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: number) => {
     return `priority-${priority}`;
   };
 
-  const normalizeText = (value) => (value || '').toString().toLowerCase().trim();
+  const normalizeText = (value: any) => (value || '').toString().toLowerCase().trim();
 
-  const calculateDistance = (source, target) => {
+  const calculateDistance = (source: string, target: string) => {
     if (!source || !target) return Number.MAX_SAFE_INTEGER;
     const sourceLength = source.length;
     const targetLength = target.length;
@@ -113,12 +113,12 @@ function UserDashboard() {
   };
 
   const categories = useMemo(() => {
-    const values = allBooks.map((book) => book.category).filter(Boolean);
+    const values = allBooks.map((book) => book.category).filter(Boolean) as string[];
     return Array.from(new Set(values)).sort();
   }, [allBooks]);
 
   const publishers = useMemo(() => {
-    const values = allBooks.map((book) => book.publisher_name).filter(Boolean);
+    const values = allBooks.map((book) => book.publisher_name).filter(Boolean) as string[];
     return Array.from(new Set(values)).sort();
   }, [allBooks]);
 
@@ -244,8 +244,8 @@ function UserDashboard() {
                     >
                       <h3>{list.name}</h3>
                       <p>{list.description}</p>
-                      <span className={`status-badge ${list.is_public ? 'status-found' : 'status-pending'}`}>
-                        {list.is_public ? t('public') : t('private')}
+                      <span className={`status-badge ${list.visibility === 'public' ? 'status-found' : 'status-pending'}`}>
+                        {list.visibility === 'public' ? t('public') : t('private')}
                       </span>
                     </div>
                   ))}
@@ -272,7 +272,7 @@ function UserDashboard() {
                       {listBooks.map((book) => (
                         <tr key={book.id}>
                           <td>{book.title}</td>
-                          <td>{book.author}</td>
+                          <td>{book.author_name}</td>
                           <td>{book.publisher_name}</td>
                           <td>{book.hall_number}/{book.booth_number}</td>
                           <td>{book.original_price}</td>
@@ -282,10 +282,11 @@ function UserDashboard() {
                               value={book.status}
                               onChange={(e) => handleUpdateBookStatus(book.id, e.target.value, book.priority)}
                             >
-                              <option value="want">{t('want')}</option>
-                              <option value="maybe">{t('maybe')}</option>
-                              <option value="thinking">{t('thinking')}</option>
-                              <option value="cancel">{t('cancel')}</option>
+                              <option value="pending">{t('pending')}</option>
+                              <option value="claimed">{t('found')}</option>
+                              <option value="in_progress">{t('searching')}</option>
+                              <option value="sourced">{t('found')}</option>
+                              <option value="cancelled">{t('cancel')}</option>
                             </select>
                           </td>
                           <td>
@@ -355,8 +356,8 @@ function UserDashboard() {
                     onChange={(e) => setSelectedPublisher(e.target.value)}
                   >
                     <option value="all">{t('all')}</option>
-                    {publishers.map((publisher) => (
-                      <option key={publisher} value={publisher}>{publisher}</option>
+                    {publishers.map((pub) => (
+                      <option key={pub} value={pub}>{pub}</option>
                     ))}
                   </select>
                   <input
@@ -505,7 +506,7 @@ function UserDashboard() {
                           {t(order.shipping_status)}
                         </span>
                       </td>
-                      <td>{order.admin_name || '-'}</td>
+                      <td>-</td>
                     </tr>
                   ))}
                 </tbody>

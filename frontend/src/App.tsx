@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './i18n';
@@ -9,9 +9,10 @@ import Register from './pages/Register';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Header from './components/Header';
+import { User } from './api';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function App() {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   }, [i18n.language]);
 
-  const handleLogin = (userData, token) => {
+  const handleLogin = (userData: User, token: string) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
@@ -58,7 +59,7 @@ function App() {
           } />
           <Route path="/*" element={
             !user ? <Navigate to="/login" /> :
-            user.role === 'admin' ? <AdminDashboard /> : <UserDashboard />
+            user.role === 'super_admin' ? <AdminDashboard /> : <UserDashboard />
           } />
         </Routes>
       </div>

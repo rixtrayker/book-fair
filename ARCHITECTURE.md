@@ -305,32 +305,35 @@ USER SIDE
 ## 📦 Module Dependencies
 
 ```
-                     ┌─────────────┐
-                     │ App Module  │
-                     └──────┬──────┘
-                            │
-         ┌──────────────────┼──────────────────┐
-         │                  │                  │
-         ▼                  ▼                  ▼
+                      ┌─────────────┐
+                      │ App Module  │
+                      └──────┬──────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+          ▼                  ▼                  ▼
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │ Auth Module │    │Users Module │    │Publishers   │
-│             │    │             │    │Module       │
-└─────────────┘    └─────────────┘    └─────────────┘
-        │
-        │ provides
-        ▼
+│ + JwtModule │    │ + JwtModule │    │Module       │
+└─────────────┘    └─────────────┘    │ + JwtModule │
+         │                             └─────────────┘
+         │ provides
+         ▼
 ┌─────────────┐
 │ JWT Strategy│
 │ Auth Guards │
 └─────────────┘
-        │
-        │ used by
-        ▼
+         │
+         │ used by (all import JwtModule)
+         ▼
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │Books Module │    │Lists Module │    │Orders Module│    │Notifications│
-└─────────────┘    └─────────────┘    └─────────────┘    │   Module    │
-                                                          └─────────────┘
+│ + JwtModule │    │ + JwtModule │    │ + JwtModule │    │   Module    │
+└─────────────┘    └─────────────┘    └─────────────┘    │ + JwtModule │
+                                                           └─────────────┘
 ```
+
+> **Note:** All modules using AuthGuard must import JwtModule to resolve the JwtService dependency.
 
 ---
 

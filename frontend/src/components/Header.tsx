@@ -1,7 +1,13 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { User } from '../api';
 
-function Header({ user, onLogout, onToggleLanguage }) {
+interface HeaderProps {
+  user: User;
+  onLogout: () => void;
+  onToggleLanguage: () => void;
+}
+
+function Header({ user, onLogout, onToggleLanguage }: HeaderProps) {
   const { t, i18n } = useTranslation();
 
   return (
