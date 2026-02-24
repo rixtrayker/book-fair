@@ -1,0 +1,78 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kotobgy-postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-kotobgy}
+    volumes:
+      - kotobgy-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres} -d ${DATABASE_NAME:-kotobgy}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kotobgy-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kotobgy-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      API_PREFIX: ${API_PREFIX:-api/v1}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-kotobgy}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ar}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - kotobgy-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kotobgy-frontend
+    depends_on:
+      - backend
+    networks:
+      - kotobgy-network
+    restart: unless-stopped
+
+  proxy:
+    image: nginx:alpine
+    container_name: kotobgy-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./kotobgy.dev+2.pem:/etc/nginx/ssl/kotobgy.dev+2.pem:ro
+      - ./kotobgy.dev+2-key.pem:/etc/nginx/ssl/kotobgy.dev+2-key.pem:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - kotobgy-network
+    restart: unless-stopped
+
+volumes:
+  kotobgy-db:
+
+networks:
+  kotobgy-network:
+    driver: bridge

@@ -34,3 +34,6 @@ npm-debug.log*
 coverage/
 .nyc_output/
 newman-results.json
+
+# SSL certificates (local only)
+*.pem

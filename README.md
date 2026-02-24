@@ -6,14 +6,18 @@ A bilingual (Arabic-first) platform connecting book enthusiasts with collectors 
 
 ```
 book-fair/
-├── backend/          # NestJS API
-├── frontend/         # React + TypeScript SPA
-├── SPEC.md           # Project specification
-├── STATUS.md         # Current status & next steps
-├── BUSINESS.md       # Business requirements
-├── PROJECT_PROMPT.md # Backend refactoring plan
-├── ARCHITECTURE.md   # System architecture diagrams
-└── API-TESTING.md    # API testing guide
+├── backend/              # NestJS API
+├── frontend/             # React + TypeScript SPA
+├── proxy/                # nginx reverse proxy config
+├── docker-compose.yml    # Docker orchestration
+├── .env.docker           # Environment template
+├── SPEC.md               # Project specification
+├── STATUS.md             # Current status & next steps
+├── BUSINESS.md           # Business requirements
+├── PROJECT_PROMPT.md     # Backend refactoring plan
+├── ARCHITECTURE.md       # System architecture diagrams
+├── API-TESTING.md        # API testing guide
+└── DEV.md                # Development guide
 ```
 
 ## Quick Start
@@ -71,6 +75,7 @@ npm run build
 
 ## Documentation
 
+- [DEV.md](./DEV.md) - Development guide & Docker setup
 - [SPEC.md](./SPEC.md) - Complete project specification
 - [STATUS.md](./STATUS.md) - Current status & next steps
 - [BUSINESS.md](./BUSINESS.md) - Business requirements & personas
