@@ -10,7 +10,9 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
     port: 3000,
+    allowedHosts: ['kotobgy.dev', 'api.kotobgy.dev', 'localhost'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
