@@ -90,8 +90,11 @@ export const publishers = {
 export const books = {
   create: (data: CreateBookDto) => api.post<ApiResponse<Book>>('/books', data),
 
-  getAll: (params?: PaginationParams & { search?: string }) =>
+  getAll: (params?: PaginationParams) =>
     api.get<PaginatedResponse<Book>>('/books', { params }),
+
+  search: (params: { q: string; limit?: number }) =>
+    api.get<PaginatedResponse<BookWithRank>>('/books/search', { params }),
 
   getOne: (id: number) => api.get<ApiResponse<Book>>(`/books/${id}`),
 
@@ -225,12 +228,14 @@ export interface Publisher {
 export interface Book {
   id: number;
   title: string;
-  author_name: string;
+  author: string | null;
+  author_name?: string;
   publisher_id: number | null;
   publisher_name?: string;
   isbn: string | null;
   original_price: number | null;
   category?: string;
+  cover_image?: string | null;
   hall_number?: string;
   booth_number?: string;
   created_at: string;
@@ -238,9 +243,13 @@ export interface Book {
   deleted_at: string | null;
 }
 
+export interface BookWithRank extends Book {
+  rank: number;
+}
+
 export interface CreateBookDto {
   title: string;
-  author_name: string;
+  author?: string;
   publisher_id?: number;
   isbn?: string;
   original_price?: number;
